@@ -23,10 +23,12 @@ walkLeft = [pygame.image.load('res\pygame_left_1.png'),
 bg = pygame.image.load('res\pygame_bg.jpg')
 playerStand = pygame.image.load('res\image.png')
 
+clock = pygame.time.Clock()
+
 x = 50
 y = 425
 width = 60
-height = 71 
+height = 71
 speed = 5
 
 isJump = False
@@ -36,9 +38,42 @@ left = False
 right = False
 animCount = 0
 
+
+class snaryad:
+    def __init__(self, x, y, radius, color, facing):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = color
+        self.facing = facing
+        self.vel = 8 * facing
+
+    def draw(self, win):
+        pygame.draw.circle(win, self.color, (self.x, self.y),
+                           self.radius)
+
+
+def drawWindow():
+    global animCount
+    win.blit(bg, (0, 0))
+
+    if animCount + 1 >= 30:
+        animCount = 0
+    if left:
+        win.blit(walkLeft[animCount // 5], (x, y))
+        animCount += 1
+    elif right:
+        win.blit(walkRight[animCount // 5], (x, y))
+        animCount += 1
+    else:
+        win.blit(playerStand, (x, y))
+    pygame.display.update()
+
+
+bullets = []
 run = True
 while run:
-    pygame.time.delay(50)
+    clock.tick(30)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -46,9 +81,16 @@ while run:
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT] and x > 5:
         x -= speed
-    if keys[pygame.K_RIGHT] and x < 495 - width:
+        left = True
+        right = False
+    elif keys[pygame.K_RIGHT] and x < 495 - width:
         x += speed
-
+        right = True
+        left = False
+    else:
+        right = False
+        left = False
+        animCount = 0
     if not isJump:
         if keys[pygame.K_SPACE]:
             isJump = True
@@ -61,5 +103,7 @@ while run:
     else:
         isJump = False
         jumpCount = 10
+
+    drawWindow()
 
 pygame.quit()
