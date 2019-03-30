@@ -38,6 +38,8 @@ left = False
 right = False
 animCount = 0
 
+lastMove = "right"
+
 
 class snaryad:
     def __init__(self, x, y, radius, color, facing):
@@ -46,7 +48,7 @@ class snaryad:
         self.radius = radius
         self.color = color
         self.facing = facing
-        self.vel = 8 * facing
+        self.vel = 12 * facing
 
     def draw(self, win):
         pygame.draw.circle(win, self.color, (self.x, self.y),
@@ -67,6 +69,10 @@ def drawWindow():
         animCount += 1
     else:
         win.blit(playerStand, (x, y))
+
+    for bullet in bullets:
+        bullet.draw(win)
+        
     pygame.display.update()
 
 
@@ -78,15 +84,32 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
+    for bullet in bullets:
+        if 500 > bullet.x > 0:
+            bullet.x += bullet.vel
+        else:
+            bullets.pop(bullets.index(bullet))
+
     keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_f]:
+        if lastMove == "right":
+            facing = 1
+        elif lastMove == "left":
+            facing = -1
+
+        if len(bullets) < 5:
+            bullets.append(snaryad(round(x + width // 2), round(y + height // 2), 5, (255, 0, 0), facing))
     if keys[pygame.K_LEFT] and x > 5:
         x -= speed
         left = True
         right = False
+        lastMove = "left"
     elif keys[pygame.K_RIGHT] and x < 495 - width:
         x += speed
         right = True
         left = False
+        lastMove = "right"
     else:
         right = False
         left = False
